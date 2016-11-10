@@ -26,21 +26,10 @@ test.before(() => mkdirpP(nested)
 
 test.after.always(() => del(workPath, { force: true }));
 
-test('should be a directory', t => {
-    t.true(fileUtil.isDirectory(workPath));
-});
+test('should include all actual files', async t => {
+    const files = await fileUtil.getFilesToUpload(workPath);
 
-test('file should not be a directory', t => {
-    t.true(!fileUtil.isDirectory(file1));
-});
-
-test('unkown folder should not be a directory', t => {
-    const folder = path.join(os.tmpdir(), '/random-blob-here');
-    t.true(!fileUtil.isDirectory(folder));
-});
-
-test('should include all actual files', t => {
-    const files = fileUtil.getFilesToUpload(workPath);
+    console.log(files)
     t.true(files.length === 2);
     t.true(files[0].name === 'test.txt');
     t.true(files[0].path === file2);

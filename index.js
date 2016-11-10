@@ -57,7 +57,7 @@ const pkg = require('./package.json');
 
 updateNotifier({ pkg }).notify();
 
-const options = Object.assign({}, argv, { assetsFolder: argv._[0] });
+const options = Object.assign({}, argv, { assetsFolder: argv._ });
 
 function loadCredentials () {
     if (options.keyFilename) {
@@ -82,14 +82,15 @@ if (options.dryRun) {
     const { blue, yellow, green } = require('chalk');
     const table = require('text-table');
 
-    const text = getAllAssetsToUpload(options)
-        .map(({ path, destination }) => ({ file: path, destination: getGoogleUrl(destination) }))
-        .map(({ file, destination }) => [blue(file), yellow('->'), green(destination)]);
-
-    console.log('---Files that would be uploaded---');
-    console.log(table(text));
-
-    return;
+    return getAllAssetsToUpload(options)
+        .then(res => res
+            .map(({ path, destination }) => ({ file: path, destination: getGoogleUrl(destination) }))
+            .map(({ file, destination }) => [blue(file), yellow('->'), green(destination)])
+        )
+        .then(text => {
+            console.log('---Files that would be uploaded---');
+            console.log(table(text));
+        });
 }
 
 // Avoid loading credentials if we're in a dry-run
